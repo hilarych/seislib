@@ -884,9 +884,25 @@ class SeismicTomography:
         if not isinstance(A, scipy.sparse.csr_matrix):
             A = scipy.sparse.csr_matrix(A)
         slowness = slowness if slowness is not None else 1/self.velocity
-        refvel = refvel if refvel is not None else self.refvel
+        
         mesh = mesh if mesh is not None else self.grid.mesh
-        x0 = np.full(A.shape[1], 1/refvel)
+        # refvel = refvel if refvel is not None else self.refvel
+        if type(refvel) ==np.ndarray:
+            
+            print('v ref is an array.')
+            refvel = refvel
+            x0 = 1/refvel
+        elif type(refvel) == float:
+            print('v ref is a float.')
+            refvel = refvel
+            x0 = np.full(A.shape[1], 1/refvel)
+        else:
+            print('v ref is mean.')
+            refvel = self.refvel
+            x0 = np.full(A.shape[1], 1/refvel)
+        
+       
+        
         residuals = slowness - A.dot(x0)
         lhs = A.T @ A
         if ndamp > 0:
@@ -1003,8 +1019,19 @@ class SeismicTomography:
         if not isinstance(A, scipy.sparse.csr_matrix):
             A = scipy.sparse.csr_matrix(A)
         slowness = slowness if slowness is not None else 1/self.velocity
-        refvel = refvel if refvel is not None else self.refvel
+        # refvel = refvel if refvel is not None else self.refvel
         mesh = mesh if mesh is not None else self.grid.mesh
+        if type(refvel) ==np.ndarray:
+            
+            print('v ref is an array.')
+            refvel = refvel
+        elif type(refvel) == float:
+            print('v ref is a float.')
+            refvel = refvel
+        else:
+            print('v ref is mean.')
+            refvel = self.refvel
+        
         if damping!='roughness' and damping!='norm':
             string = 'Unrecognized damping type: only "roughness" and "norm"'
             string += ' are allowed. Roughness damping will be used instead.'
